@@ -20,7 +20,7 @@ And then after the `FinalBatchJob` runs we actually send the span for the 'virtu
 ### Differences from my `real` code
 
 0. This demo passes the params to each job manually. In real life I save these to a different DB table, and associate that to each job
-0. In this demo we don't 'fan-out' in the jobs and enqueue more than 1 ever, but we do in real life. Other code manages knowning when the fan-out is complete to actually send the batch to DD
+0. In this demo we don't 'fan-out' in the jobs and enqueue more than 1 from a single job, but we do in real life. Other code manages knowning when the fan-out is complete to actually send the batch to DD
 0. We are using Postgres and this is SQLite [can't imagine that matters]
 
 Besides that this is basically a copy-paste of my existing Pre-1.0 code trimmed down to its most minimal form
