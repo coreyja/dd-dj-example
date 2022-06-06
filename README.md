@@ -21,3 +21,9 @@ And then after the `FinalBatchJob` runs we actually send the span for the 'virtu
 0. We are using Postgres and this is SQLite [can't imagine that matters]
 
 Besides that this is basically a copy-paste of my existing Pre-1.0 code trimmed down to its most minimal form
+
+# Datadog UI Example
+
+This code generated the following trace UI in Datadog
+
+![test](./ScreenShot.png)
