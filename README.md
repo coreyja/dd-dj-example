@@ -4,6 +4,9 @@ This is an example Repo to show how we have wired up a way to use Distributed Tr
 to 'batch' a group of Delayed Jobs via a DelayedJob Plugin and some careful working of the Datadog
 SDK
 
+All the relevant models live under the `app/models` directory.
+The only other interesting file to look at is the `config/initiliazers/delayed_job.rb` where we have to insert my custom plugin AFTER the one that is inserted by DataDog
+
 Entrypoint: `BatchStart.start`
 This will kick off the 'first' job in our batch, passing in a generated trace and span id and a start time
 
