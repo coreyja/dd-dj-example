@@ -29,4 +29,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'delayed_job_active_record'
 
-gem 'ddtrace', '< 1.0'
+gem 'ddtrace', '> 1.0'
