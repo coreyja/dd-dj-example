@@ -24,25 +24,21 @@ class DelayedJobBatchesPlugin < Delayed::Plugin
         puts "About to send root span. span_id: #{job.payload_object.datadog_span_id} trace_id: #{job.payload_object.datadog_trace_id}"
 
         empty_digest = Datadog::Tracing::TraceDigest.new
-        Datadog::Tracing.trace(
+        # start_at is ignored when a block is passed: https://github.com/DataDog/dd-trace-rb/blob/0646d7dd2d976e289da4eda43784a3687b35256d/lib/datadog/tracing/tracer.rb#L375=
+        # So we use the block-less version
+        # This does NOT give us access to the TraceOperation but it turns out we don't need it here
+        # We actually need to set @trace_id on the span_op NOT @id on the trace_op
+        # That seems to be what matters what getting things to send correctly
+        span = Datadog::Tracing.trace(
           'delayed_job_batch.run',
           continue_from: empty_digest,
-          # start_at is ignored when a block is passed: https://github.com/DataDog/dd-trace-rb/blob/0646d7dd2d976e289da4eda43784a3687b35256d/lib/datadog/tracing/tracer.rb#L375=
-          # And we need to pass a block to have access to the TraceOperation, and only the SpanOperation is returned from the block-less version
-          # start_time: job.payload_object.batch_start_at.utc,
+          start_time: job.payload_object.batch_start_at.utc,
           service: 'delayed_job_batch',
           resource: 'SyncGraph'
-        ) do |span, trace|
-          span.instance_variable_set(:@id, job.payload_object.datadog_span_id)
-          span.instance_variable_set(:@trace_id, job.payload_object.datadog_trace_id)
-          # We need to set the start_time to our timestamp
-          # We nil out the `duratoin_start` since its an either or thing with start_at, we don't want them both to be present
-          # Source: https://github.com/DataDog/dd-trace-rb/blob/0646d7dd2d976e289da4eda43784a3687b35256d/lib/datadog/tracing/span_operation.rb#L194-L196=
-          span.instance_variable_set(:@start_time, job.payload_object.batch_start_at.utc)
-          span.instance_variable_set(:@duration_start, nil)
-          # This doesn't seem needed for the data to send correctly
-          trace.instance_variable_set(:@id, job.payload_object.datadog_trace_id)
-        end
+        )
+        span.instance_variable_set(:@id, job.payload_object.datadog_span_id)
+        span.instance_variable_set(:@trace_id, job.payload_object.datadog_trace_id)
+        span.finish
       end
     end
   end
